@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+}
+body {
+    background: radial-gradient(#111628, #0b0f1d);
+    font-family: 'Roboto Mono', Arial, sans-serif;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(rgba(24, 56, 24, 0.57), rgba(40, 109, 40, 0.68));
+    opacity: 0;
+    transition: 150ms ease;
+    z-index: -1;
+    will-change: opacity;
+}
+body.success::before {
+    animation: success 2.5s;
+}
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(rgba(244, 67, 54, 0.8), rgba(206, 55, 44, 0.48));
+    opacity: 0;
+    transition: 500ms ease;
+    z-index: -1;
+    will-change: opacity;
+}
+body.gameover::after {
+    opacity: 1;
+}
+
+#countdown {
+    height: 20vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #fff;
+    text-align: center;
+    font-size: 15vh;
+    line-height: 20vh;
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+#wrapper {
+    overflow: hidden;
+    height: 100vh;
+    color: #fff;
+}
+
+#input-select {
+    float: left;
+    font-size: 2vw;
+}
+#screens {
+    width: 100%; /* 100*# of sections */
+    height: 90%;
+    font-size: 2vw;
+    /* border: solid #f99 2px; */
+    align-items: center;
+    transition: 500ms ease;
+    will-change: transform;
+}
+
+#splash {
+    font-size: 3vw;
+}
+
+nav {
+    height: 10%;
+}
+
+nav ul {
+    display: inline-block;
+    float: right;
+}
+
+nav select {
+    padding: .5vw;
+}
+
+h1 {
+    font-family: sans;
+    font-size: 4em;
+    font-style: italic;
+    text-align: center;
+    color: red;
+}
+
+section {
+    height: 100%;
+    /* border: solid #fff 2px; */
+    text-align: center;
+    overflow-y: auto;
+}
+
+#events {
+    width: 90%;
+    height: 90%;
+    margin: 0 5%;
+    padding: 0;
+    border: solid #fff 2px;
+}
+
+#events table {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+}
+
+#events table thead {
+}
+
+#events table thead th {
+    background-color: purple;
+    position: sticky;
+    top: 0;
+}
+
+#events table tbody {
+    padding-top: 1em;
+}
+
+.current {
+    background-color: #555;
+}
+
+.note {
+    display: inline-block;
+}
+
+.note svg {
+    width: 55px;
+    height: 75px;
+    transform: translateY(150px);
+    transition: 150ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.note.on svg {
+    transform: translateY(0px);
+}

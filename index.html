@@ -1,0 +1,39 @@
+<!doctype html>
+<hmtl>
+<head>
+  <title>MIDI Axe</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="wrapper"> 
+<nav>
+  <select id="input-select">
+    <option value="">Select MIDI Device</option>
+  </select>
+  <h1>MIDI Axe</h1>
+</nav>
+<div id="screens"> 
+  <section id="events">
+    <div id="splash"></div>
+    <table id="event-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Ch</th>
+          <th>Status</th>
+          <th>Data 1</th>
+          <th>Data 2</th>
+          <th>Note</th>
+          <th style="width:40%">Event</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </section>
+</div>
+</div>
+<script src="javascript/main.js"></script>
+</body>
+</html>
