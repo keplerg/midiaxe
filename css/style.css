@@ -137,10 +137,36 @@ section {
 #events table tbody tr td {
     text-align: left;
     padding-left: 1em;
+    white-space: nowrap;
 }
 
 .current {
     background-color: #555;
+}
+
+.note-off {
+    color: limegreen;
+}
+.note-on {
+    color: lightgreen;
+}
+.key-aftertouch {
+    color: peru;
+}
+.control-change {
+    color: lightblue;
+}
+.program-change {
+    color: aqua;
+}
+.channel-aftertouch {
+    color: tomato;
+}
+.pitch-bend {
+    color: hotpink;
+}
+.system-eclusive {
+    color: yellow;
 }
 
 .note {

@@ -48,7 +48,8 @@ function onMIDISelect(e) {
             last_row.classList.remove('current');
         }
         new_row.classList.add('current');
-        new_row.innerHTML = '<tr><td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td></tr>';
+        new_row.classList.add(get_event_class(message.data[0]));
+        new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
         new_row.scrollIntoView();
     }
   }
@@ -119,6 +120,22 @@ function get_note(status, data) {
     }
 }
 
+function get_event_class(status) {
+    let clazz = '';
+    switch (Math.trunc(status/16)) {
+        case 8: clazz = "note-off"; break;
+        case 9: clazz = "note-on"; break;
+        case 10: clazz = "key-aftertouch"; break;
+        case 11: clazz = "control-change"; break;
+        case 12: clazz = "program-change"; break;
+        case 13: clazz = "channel-aftertouch"; break;
+        case 14: clazz = "pitch-bend"; break;
+        case 15: clazz = "system-eclusive"; break;
+        default: clazz = "a-"+Math.trunc(status/16); break;
+    }
+    return clazz;
+}
+
 function get_event(status, data) {
     let event = '???';
     switch (Math.trunc(status/16)) {
@@ -127,7 +144,7 @@ function get_event(status, data) {
         case 10: event = "Key AfterTouch"; break;
         case 11: event = "Control Change"; break;
         case 12: event = "Program Change"; break;
-        case 13: event = "Channel Aftertouch"; break;
+        case 13: event = "Channel AfterTouch"; break;
         case 14: event = "Pitch Bend"; break;
         case 15: event = "System Eclusive"; break;
     }
@@ -137,67 +154,35 @@ function get_event(status, data) {
         case 0: event = event+": Bank Select (msb)"; break;
         case 1: event = event+": Modulation Wheel (msb)"; break;
         case 2: event = event+": Breath Controller (msb)"; break;
-        case 3: event = event+": Undefined (msb)"; break;
         case 4: event = event+": Foot Pedal (msb)"; break;
         case 5: event = event+": Portamento Time (msb)"; break;
         case 6: event = event+": Data Entry (msb)"; break;
         case 7: event = event+": Volume (msb)"; break;
         case 8: event = event+": Balance (msb)"; break;
-        case 9: event = event+": Undefined (msb)"; break;
         case 10: event = event+": Pan (msb)"; break;
         case 11: event = event+": Expression (msb)"; break;
         case 12: event = event+": Effect 1 (msb)"; break;
         case 13: event = event+": Effect 2 (msb)"; break;
-        case 14: event = event+": Undefined (msb)"; break;
-        case 15: event = event+": Undefined (msb)"; break;
         case 16: event = event+": General Purpose 1 (msb)"; break;
         case 17: event = event+": General Purpose 2 (msb)"; break;
         case 18: event = event+": General Purpose 3 (msb)"; break;
         case 19: event = event+": General Purpose 4 (msb)"; break;
-        case 20: event = event+": Undefined (msb)"; break;
-        case 21: event = event+": Undefined (msb)"; break;
-        case 22: event = event+": Undefined (msb)"; break;
-        case 23: event = event+": Undefined (msb)"; break;
-        case 24: event = event+": Undefined (msb)"; break;
-        case 25: event = event+": Undefined (msb)"; break;
-        case 26: event = event+": Undefined (msb)"; break;
-        case 27: event = event+": Undefined (msb)"; break;
-        case 28: event = event+": Undefined (msb)"; break;
-        case 29: event = event+": Undefined (msb)"; break;
-        case 30: event = event+": Undefined (msb)"; break;
-        case 31: event = event+": Undefined (msb)"; break;
         case 32: event = event+": Bank Select (lsb)"; break;
         case 33: event = event+": Modulation Wheel (lsb)"; break;
         case 34: event = event+": Breath Controller (lsb)"; break;
-        case 35: event = event+": Undefined (lsb)"; break;
         case 36: event = event+": Foot Pedal (lsb)"; break;
         case 37: event = event+": Portamento Time (lsb)"; break;
         case 38: event = event+": Data Entry (lsb)"; break;
         case 39: event = event+": Volume (lsb)"; break;
         case 40: event = event+": Balance (lsb)"; break;
-        case 41: event = event+": Undefined (lsb)"; break;
         case 42: event = event+": Pan (lsb)"; break;
         case 43: event = event+": Expression (lsb)"; break;
         case 44: event = event+": Effect 1 (lsb)"; break;
         case 45: event = event+": Effect 2 (lsb)"; break;
-        case 46: event = event+": Undefined (lsb)"; break;
-        case 47: event = event+": Undefined (lsb)"; break;
         case 48: event = event+": General Purpose 1 (lsb)"; break;
         case 49: event = event+": General Purpose 2 (lsb)"; break;
         case 50: event = event+": General Purpose 3 (lsb)"; break;
         case 51: event = event+": General Purpose 4 (lsb)"; break;
-        case 52: event = event+": Undefined (lsb)"; break;
-        case 53: event = event+": Undefined (lsb)"; break;
-        case 54: event = event+": Undefined (lsb)"; break;
-        case 55: event = event+": Undefined (lsb)"; break;
-        case 56: event = event+": Undefined (lsb)"; break;
-        case 57: event = event+": Undefined (lsb)"; break;
-        case 58: event = event+": Undefined (lsb)"; break;
-        case 59: event = event+": Undefined (lsb)"; break;
-        case 60: event = event+": Undefined (lsb)"; break;
-        case 61: event = event+": Undefined (lsb)"; break;
-        case 62: event = event+": Undefined (lsb)"; break;
-        case 63: event = event+": Undefined (lsb)"; break;
         case 64: event = event+": Damper Pedal on/off"; break;
         case 65: event = event+": Portamento on/off"; break;
         case 66: event = event+": Sostenuto Pedal on/off"; break;
@@ -219,12 +204,7 @@ function get_event(status, data) {
         case 82: event = event+": General Purpose 3"; break;
         case 83: event = event+": General Purpose 4"; break;
         case 84: event = event+": Portamento Control"; break;
-        case 85: event = event+": Undefined"; break;
-        case 86: event = event+": Undefined"; break;
-        case 87: event = event+": Undefined"; break;
         case 88: event = event+": High Res Velocity"; break;
-        case 89: event = event+": Undefined"; break;
-        case 90: event = event+": Undefined"; break;
         case 91: event = event+": Effect 1 Depth"; break;
         case 92: event = event+": Effect 2 Depth"; break;
         case 93: event = event+": Effect 3 Depth"; break;
@@ -236,24 +216,6 @@ function get_event(status, data) {
         case 99: event = event+": NRPN (msb)"; break;
         case 100: event = event+": RPN (lsb)"; break;
         case 101: event = event+": RPN (msb)"; break;
-        case 102: event = event+": Undefined"; break;
-        case 103: event = event+": Undefined"; break;
-        case 104: event = event+": Undefined"; break;
-        case 105: event = event+": Undefined"; break;
-        case 106: event = event+": Undefined"; break;
-        case 107: event = event+": Undefined"; break;
-        case 108: event = event+": Undefined"; break;
-        case 109: event = event+": Undefined"; break;
-        case 110: event = event+": Undefined"; break;
-        case 111: event = event+": Undefined"; break;
-        case 112: event = event+": Undefined"; break;
-        case 113: event = event+": Undefined"; break;
-        case 114: event = event+": Undefined"; break;
-        case 115: event = event+": Undefined"; break;
-        case 116: event = event+": Undefined"; break;
-        case 117: event = event+": Undefined"; break;
-        case 118: event = event+": Undefined"; break;
-        case 119: event = event+": Undefined"; break;
         case 120: event = event+": All Sound Off"; break;
         case 121: event = event+": Reset Controllers"; break;
         case 122: event = event+": Local on/off Switch"; break;
