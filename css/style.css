@@ -134,6 +134,11 @@ section {
     padding-top: 1em;
 }
 
+#events table tbody tr td {
+    text-align: left;
+    padding-left: 1em;
+}
+
 .current {
     background-color: #555;
 }

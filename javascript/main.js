@@ -36,8 +36,10 @@ function onMIDISelect(e) {
     if (last_row != undefined) {
         last_row.classList.remove('current');
     }
+    let selected_name = document.querySelector('#input-select option:checked').innerText;
     new_row.classList.add('current');
-    new_row.innerHTML = '<tr><td colspan="5">device opened!</td><td></td><td></td></tr>';
+    new_row.innerHTML = '<tr><td colspan="7">'+selected_name+' device opened!</td></tr>';
+    new_row.scrollIntoView();
     input.onmidimessage = function(message) {
         let last_row =  document.querySelector('#events table tbody tr:last-child');
         console.log(last_row);
@@ -46,7 +48,7 @@ function onMIDISelect(e) {
             last_row.classList.remove('current');
         }
         new_row.classList.add('current');
-        new_row.innerHTML = '<tr><td style="text-align:left;padding-left:1em;">'+(Math.round(message.timeStamp)/1000)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>Note</td><td>Event</td></tr>';
+        new_row.innerHTML = '<tr><td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td></tr>';
         new_row.scrollIntoView();
     }
   }
@@ -82,6 +84,187 @@ function sendMIDIMessage(sequence) {
   if (output != undefined) {
     output.send(sequence);
   }
+}
+
+function format_timestamp(timestamp) {
+    let num = Math.round(timestamp);
+    let seconds = Math.trunc(num / 1000);
+    let microseconds = num % 1000;
+    return seconds+'.'+(microseconds+'000').substr(0,3);
+}
+
+function get_note(status, data) {
+    let event = Math.trunc(status/16);
+    let note = '';
+    let octave = Math.trunc(data/12)-1;
+
+    if (event == 8 || event == 9 || event == 10) {
+        switch (data % 12) {
+        case 0: note = "C"; break;
+        case 1: note = "C&#9839;/D&#9837;"; break;
+        case 2: note = "D"; break;
+        case 3: note = "D&#9839;/E&#9837;"; break;
+        case 4: note = "E"; break;
+        case 5: note = "F"; break;
+        case 6: note = "F&#9839;/G&#9837;"; break;
+        case 7: note = "G"; break;
+        case 8: note = "G&#9839;/A&#9837;"; break;
+        case 9: note = "A"; break;
+        case 10: note = "A&#9839;/B&#9837;"; break;
+        case 11: note = "B"; break;
+        }
+        return note+' '+octave;
+    } else {
+        return '---';
+    }
+}
+
+function get_event(status, data) {
+    let event = '???';
+    switch (Math.trunc(status/16)) {
+        case 8: event = "Note Off"; break;
+        case 9: event = "Note On"; break;
+        case 10: event = "Key AfterTouch"; break;
+        case 11: event = "Control Change"; break;
+        case 12: event = "Program Change"; break;
+        case 13: event = "Channel Aftertouch"; break;
+        case 14: event = "Pitch Bend"; break;
+        case 15: event = "System Eclusive"; break;
+    }
+
+    if (event == 'Control Change') {
+        switch (data % 12) {
+        case 0: event = event+": Bank Select (msb)"; break;
+        case 1: event = event+": Modulation Wheel (msb)"; break;
+        case 2: event = event+": Breath Controller (msb)"; break;
+        case 3: event = event+": Undefined (msb)"; break;
+        case 4: event = event+": Foot Pedal (msb)"; break;
+        case 5: event = event+": Portamento Time (msb)"; break;
+        case 6: event = event+": Data Entry (msb)"; break;
+        case 7: event = event+": Volume (msb)"; break;
+        case 8: event = event+": Balance (msb)"; break;
+        case 9: event = event+": Undefined (msb)"; break;
+        case 10: event = event+": Pan (msb)"; break;
+        case 11: event = event+": Expression (msb)"; break;
+        case 12: event = event+": Effect 1 (msb)"; break;
+        case 13: event = event+": Effect 2 (msb)"; break;
+        case 14: event = event+": Undefined (msb)"; break;
+        case 15: event = event+": Undefined (msb)"; break;
+        case 16: event = event+": General Purpose 1 (msb)"; break;
+        case 17: event = event+": General Purpose 2 (msb)"; break;
+        case 18: event = event+": General Purpose 3 (msb)"; break;
+        case 19: event = event+": General Purpose 4 (msb)"; break;
+        case 20: event = event+": Undefined (msb)"; break;
+        case 21: event = event+": Undefined (msb)"; break;
+        case 22: event = event+": Undefined (msb)"; break;
+        case 23: event = event+": Undefined (msb)"; break;
+        case 24: event = event+": Undefined (msb)"; break;
+        case 25: event = event+": Undefined (msb)"; break;
+        case 26: event = event+": Undefined (msb)"; break;
+        case 27: event = event+": Undefined (msb)"; break;
+        case 28: event = event+": Undefined (msb)"; break;
+        case 29: event = event+": Undefined (msb)"; break;
+        case 30: event = event+": Undefined (msb)"; break;
+        case 31: event = event+": Undefined (msb)"; break;
+        case 32: event = event+": Bank Select (lsb)"; break;
+        case 33: event = event+": Modulation Wheel (lsb)"; break;
+        case 34: event = event+": Breath Controller (lsb)"; break;
+        case 35: event = event+": Undefined (lsb)"; break;
+        case 36: event = event+": Foot Pedal (lsb)"; break;
+        case 37: event = event+": Portamento Time (lsb)"; break;
+        case 38: event = event+": Data Entry (lsb)"; break;
+        case 39: event = event+": Volume (lsb)"; break;
+        case 40: event = event+": Balance (lsb)"; break;
+        case 41: event = event+": Undefined (lsb)"; break;
+        case 42: event = event+": Pan (lsb)"; break;
+        case 43: event = event+": Expression (lsb)"; break;
+        case 44: event = event+": Effect 1 (lsb)"; break;
+        case 45: event = event+": Effect 2 (lsb)"; break;
+        case 46: event = event+": Undefined (lsb)"; break;
+        case 47: event = event+": Undefined (lsb)"; break;
+        case 48: event = event+": General Purpose 1 (lsb)"; break;
+        case 49: event = event+": General Purpose 2 (lsb)"; break;
+        case 50: event = event+": General Purpose 3 (lsb)"; break;
+        case 51: event = event+": General Purpose 4 (lsb)"; break;
+        case 52: event = event+": Undefined (lsb)"; break;
+        case 53: event = event+": Undefined (lsb)"; break;
+        case 54: event = event+": Undefined (lsb)"; break;
+        case 55: event = event+": Undefined (lsb)"; break;
+        case 56: event = event+": Undefined (lsb)"; break;
+        case 57: event = event+": Undefined (lsb)"; break;
+        case 58: event = event+": Undefined (lsb)"; break;
+        case 59: event = event+": Undefined (lsb)"; break;
+        case 60: event = event+": Undefined (lsb)"; break;
+        case 61: event = event+": Undefined (lsb)"; break;
+        case 62: event = event+": Undefined (lsb)"; break;
+        case 63: event = event+": Undefined (lsb)"; break;
+        case 64: event = event+": Damper Pedal on/off"; break;
+        case 65: event = event+": Portamento on/off"; break;
+        case 66: event = event+": Sostenuto Pedal on/off"; break;
+        case 67: event = event+": Soft Pedal on/off"; break;
+        case 68: event = event+": Legato FootSwitch"; break;
+        case 69: event = event+": Hold 2"; break;
+        case 70: event = event+": Sound Controller 1"; break;
+        case 71: event = event+": Sound Controller 2"; break;
+        case 72: event = event+": Sound Controller 3"; break;
+        case 73: event = event+": Sound Controller 4"; break;
+        case 74: event = event+": Sound Controller 5"; break;
+        case 75: event = event+": Sound Controller 6"; break;
+        case 76: event = event+": Sound Controller 7"; break;
+        case 77: event = event+": Sound Controller 8"; break;
+        case 78: event = event+": Sound Controller 9"; break;
+        case 79: event = event+": Sound Controller 10"; break;
+        case 80: event = event+": General Purpose 1"; break;
+        case 81: event = event+": General Purpose 2"; break;
+        case 82: event = event+": General Purpose 3"; break;
+        case 83: event = event+": General Purpose 4"; break;
+        case 84: event = event+": Portamento Control"; break;
+        case 85: event = event+": Undefined"; break;
+        case 86: event = event+": Undefined"; break;
+        case 87: event = event+": Undefined"; break;
+        case 88: event = event+": High Res Velocity"; break;
+        case 89: event = event+": Undefined"; break;
+        case 90: event = event+": Undefined"; break;
+        case 91: event = event+": Effect 1 Depth"; break;
+        case 92: event = event+": Effect 2 Depth"; break;
+        case 93: event = event+": Effect 3 Depth"; break;
+        case 94: event = event+": Effect 4 Depth"; break;
+        case 95: event = event+": Effect 5 Depth"; break;
+        case 96: event = event+": (+1) Data Increment"; break;
+        case 97: event = event+": (-1) Data Decrement"; break;
+        case 98: event = event+": NRPN (lsb)"; break;
+        case 99: event = event+": NRPN (msb)"; break;
+        case 100: event = event+": RPN (lsb)"; break;
+        case 101: event = event+": RPN (msb)"; break;
+        case 102: event = event+": Undefined"; break;
+        case 103: event = event+": Undefined"; break;
+        case 104: event = event+": Undefined"; break;
+        case 105: event = event+": Undefined"; break;
+        case 106: event = event+": Undefined"; break;
+        case 107: event = event+": Undefined"; break;
+        case 108: event = event+": Undefined"; break;
+        case 109: event = event+": Undefined"; break;
+        case 110: event = event+": Undefined"; break;
+        case 111: event = event+": Undefined"; break;
+        case 112: event = event+": Undefined"; break;
+        case 113: event = event+": Undefined"; break;
+        case 114: event = event+": Undefined"; break;
+        case 115: event = event+": Undefined"; break;
+        case 116: event = event+": Undefined"; break;
+        case 117: event = event+": Undefined"; break;
+        case 118: event = event+": Undefined"; break;
+        case 119: event = event+": Undefined"; break;
+        case 120: event = event+": All Sound Off"; break;
+        case 121: event = event+": Reset Controllers"; break;
+        case 122: event = event+": Local on/off Switch"; break;
+        case 123: event = event+": All Notes Off"; break;
+        case 124: event = event+": Omni Mode Off"; break;
+        case 125: event = event+": Omni Mode On"; break;
+        case 126: event = event+": Mono Mode"; break;
+        case 127: event = event+": Poly Mode"; break;
+        }
+    }
+    return event;
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
