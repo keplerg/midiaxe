@@ -41,15 +41,35 @@ function onMIDISelect(e) {
     new_row.innerHTML = '<tr><td colspan="7">'+selected_name+' device opened!</td></tr>';
     new_row.scrollIntoView();
     input.onmidimessage = function(message) {
+        console.log(message.data);
         let last_row =  document.querySelector('#events table tbody tr:last-child');
-        console.log(last_row);
         let new_row = document.querySelector('#events table tbody').insertRow(-1);
         if (last_row != undefined) {
             last_row.classList.remove('current');
         }
+        let event_class = get_event_class(message.data[0]);
+        let data_length = message.data.length;
+        new_row.classList.add(event_class);
+        if (event_class == 'system-exclusive') {
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td colspan="3">Buffer: '+data_length+' Bytes'+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+            let current_byte = 0;
+            while (current_byte < data_length) {
+                let str = '<td colspan="7"> DATA:';
+                for (let i = 0; i < 20 && current_byte < data_length; i++) {
+                    new_row = document.querySelector('#events table tbody').insertRow(-1);
+                    new_row.classList.add(event_class);
+                    str += ' '+('0'+message.data[current_byte].toString(16).toUpperCase()).substr(-2);
+                    current_byte++;
+                }
+                str += '</td>';
+                new_row.innerHTML = str;
+            }
+        } else if (data_length == 2) {
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>--</td><td>--</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+        } else {
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+        }
         new_row.classList.add('current');
-        new_row.classList.add(get_event_class(message.data[0]));
-        new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
         new_row.scrollIntoView();
     }
   }
@@ -130,7 +150,7 @@ function get_event_class(status) {
         case 12: clazz = "program-change"; break;
         case 13: clazz = "channel-aftertouch"; break;
         case 14: clazz = "pitch-bend"; break;
-        case 15: clazz = "system-eclusive"; break;
+        case 15: clazz = "system-exclusive"; break;
         default: clazz = "a-"+Math.trunc(status/16); break;
     }
     return clazz;

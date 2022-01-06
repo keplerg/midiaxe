@@ -165,8 +165,11 @@ section {
 .pitch-bend {
     color: hotpink;
 }
-.system-eclusive {
+.system-exclusive {
     color: yellow;
+}
+.data {
+    color: grey;
 }
 
 .note {
