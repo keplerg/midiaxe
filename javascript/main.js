@@ -41,17 +41,18 @@ function onMIDISelect(e) {
     new_row.innerHTML = '<tr><td colspan="7">'+selected_name+' device opened!</td></tr>';
     new_row.scrollIntoView();
     input.onmidimessage = function(message) {
-        console.log(message.data);
+        // console.log(message.data);
         let last_row =  document.querySelector('#events table tbody tr:last-child');
         let new_row = document.querySelector('#events table tbody').insertRow(-1);
         if (last_row != undefined) {
             last_row.classList.remove('current');
         }
         let event_class = get_event_class(message.data[0]);
+        // console.log(event_class);
         let data_length = message.data.length;
         new_row.classList.add(event_class);
         if (event_class == 'system-exclusive') {
-            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td colspan="3">Buffer: '+data_length+' Bytes'+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td colspan="3">Buffer: '+data_length+' Bytes'+'</td><td>'+get_event(message.data[0],0,0)+'</td>';
             let current_byte = 0;
             while (current_byte < data_length) {
                 let str = '<td colspan="7"> DATA:';
@@ -65,9 +66,9 @@ function onMIDISelect(e) {
                 new_row.innerHTML = str;
             }
         } else if (data_length == 2) {
-            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>--</td><td>--</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>---</td><td>---</td><td>'+get_event(message.data[0],message.data[1],0)+'</td>';
         } else {
-            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1])+'</td>';
+            new_row.innerHTML = '<td>'+format_timestamp(message.timeStamp)+'</td><td>'+(message.data[0]%16+1)+'</td><td>'+('0'+message.data[0].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[1].toString(16).toUpperCase()).substr(-2)+'</td><td>'+('0'+message.data[2].toString(16).toUpperCase()).substr(-2)+'</td><td>'+get_note(message.data[0], message.data[1])+'</td><td>'+get_event(message.data[0],message.data[1],message.data[2])+'</td>';
         }
         new_row.classList.add('current');
         new_row.scrollIntoView();
@@ -156,11 +157,11 @@ function get_event_class(status) {
     return clazz;
 }
 
-function get_event(status, data) {
+function get_event(status, data1, data2) {
     let event = '???';
     switch (Math.trunc(status/16)) {
         case 8: event = "Note Off"; break;
-        case 9: event = "Note On"; break;
+        case 9: if (data2 == 0) {event = "Note Off"} else {event = "Note On"} break;
         case 10: event = "Key AfterTouch"; break;
         case 11: event = "Control Change"; break;
         case 12: event = "Program Change"; break;
@@ -170,7 +171,7 @@ function get_event(status, data) {
     }
 
     if (event == 'Control Change') {
-        switch (data % 12) {
+        switch (data1) {
         case 0: event = event+": Bank Select (msb)"; break;
         case 1: event = event+": Modulation Wheel (msb)"; break;
         case 2: event = event+": Breath Controller (msb)"; break;
@@ -209,15 +210,15 @@ function get_event(status, data) {
         case 67: event = event+": Soft Pedal on/off"; break;
         case 68: event = event+": Legato FootSwitch"; break;
         case 69: event = event+": Hold 2"; break;
-        case 70: event = event+": Sound Controller 1"; break;
-        case 71: event = event+": Sound Controller 2"; break;
-        case 72: event = event+": Sound Controller 3"; break;
-        case 73: event = event+": Sound Controller 4"; break;
-        case 74: event = event+": Sound Controller 5"; break;
-        case 75: event = event+": Sound Controller 6"; break;
-        case 76: event = event+": Sound Controller 7"; break;
-        case 77: event = event+": Sound Controller 8"; break;
-        case 78: event = event+": Sound Controller 9"; break;
+        case 70: event = event+": Sound Variation"; break;
+        case 71: event = event+": Timbre"; break;
+        case 72: event = event+": Release Time"; break;
+        case 73: event = event+": Attack Time"; break;
+        case 74: event = event+": Brightness"; break;
+        case 75: event = event+": Decay Time"; break;
+        case 76: event = event+": Vibrato Rate"; break;
+        case 77: event = event+": Vibrato Depth"; break;
+        case 78: event = event+": Vibrato Delay"; break;
         case 79: event = event+": Sound Controller 10"; break;
         case 80: event = event+": General Purpose 1"; break;
         case 81: event = event+": General Purpose 2"; break;
